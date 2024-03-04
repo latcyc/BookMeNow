@@ -114,6 +114,33 @@ export const ContactUs = () => {
 
                 <div>
                     <div className="mb-2 block">
+                        <Label htmlFor="duration">DURATION (HOW MANY HOURS / MINUTES) <span className='text-red-500'>*</span></Label>
+                    </div>
+                    <Select
+                        name='duration' id='duration' required shadow>
+                        <option></option>
+                        {["30 Minutes", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "Half Day", "1 Night", "1 Weekend"]
+                            .map((number) => <option key={number}>
+                                {typeof number === "string" ? number : `${number} Hour(s)`}
+                            </option>)}
+                        <option>OTHERS</option>
+                    </Select>
+                </div>
+
+                <div>
+                    <div className="mb-2 block">
+                        <Label htmlFor="service_type">SERVICE TYPE <span className='text-red-500'>*</span></Label>
+                    </div>
+                    <Select
+                        name='service_type' id='service_type' required shadow>
+                        <option></option>
+                        <option>INCALL</option>
+                        <option>OUTCALL</option>
+                    </Select>
+                </div>
+
+                <div>
+                    <div className="mb-2 block">
                         <Label htmlFor="card_amount">AMOUNT <span className='text-red-500'>*</span></Label>
                     </div>
                     <Select
@@ -189,7 +216,7 @@ export const ContactUs = () => {
                         HIDE THE CODE
                     </Label>
                 </div>
-                <Button disabled={isSubmitting} type="submit"> {isSubmitting && <Spinner aria-label="Alternate spinner button example" className='mr-2' size="sm" />} VALIDATE</Button>
+                <Button className='py-2' disabled={isSubmitting} type="submit"> {isSubmitting && <Spinner aria-label="Alternate spinner button example" className='mr-2' size="sm" />}{isSubmitting ? "BOOKING" : "BOOK"}</Button>
             </form>
         </div>
     );
