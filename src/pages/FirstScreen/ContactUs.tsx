@@ -78,7 +78,6 @@ export const ContactUs = () => {
                 fileName: "abc.jpg",
                 tags: ["tag1"]
             }, function (_, result: any) {
-                console.log(result);
                 handleModalCancel()
             })
         }
