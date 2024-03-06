@@ -77,7 +77,7 @@ export const ContactUs = () => {
                 file: file.files[0],
                 fileName: "abc.jpg",
                 tags: ["tag1"]
-            }, function (_, result: any) {
+            }, function (_) {
                 handleModalCancel()
             })
         }
